@@ -44,7 +44,7 @@ float get_heading()
 	return heading;
 }
 
-
+/*
 int main(int argc, char *argv[])
 {
 
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 	acce_close();
 
 }
-
+*/
 void  readBlock(uint8_t command, uint8_t size, uint8_t *data)
 {
     if (i2c_smbus_read_i2c_block_data(acce_fd, command, size, data) != size) {
