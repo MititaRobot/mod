@@ -10,7 +10,8 @@ int main(int argc, char **argv){
   char word[128];
 
   julius_init();
-  julius_get(word);
+	printf("unko");
+	julius_get(word);
   printf("%s/n", word);
   return 0;
 }

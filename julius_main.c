@@ -4,14 +4,14 @@
 #include <netinet/in.h>
 #include "julius_func.h"
 
-#define HOST_PORT 10500
-#define HOST_ADDR "192.168.0.123"
-
 int main(int argc, char **argv){
-
-  
+  int s;
 	char word[128];
-	julius_get(word);
+	word[0] = '\0';
+
+	connectJulius(i);
+	julius_get(s, word);
 	printf("%s/n", word);
+	close(s);
   return 0;
 }

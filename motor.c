@@ -31,7 +31,7 @@ struct ccmd* cmd;
 int quit_flag = 1;
 float first_heading = 0;
 
-int main(int argc, char **argv)
+/*int main(int argc, char **argv)
 {
   int i;
 
@@ -40,18 +40,18 @@ int main(int argc, char **argv)
   motor_init();
 	i = 0;
 
-	turn_right(12000);
+	move_left(100,5000);
   while (quit_flag)  {
 		usleep(1000);
   }
   
-	/* end */
 	SET_ZERO();
   write_command();
 
   motor_close();
   return 0;
 }
+*/
 
 void exit_program(int sig)
 {
@@ -97,6 +97,7 @@ void move_left(int radius,int speed)
 {	
 	const float size = 30;
 	int speedr = speed * (float)(radius + size) / size;
+	fprintf(stderr,"%d %d",speed,speedr);
 	SET_OFFSET2(speed,speedr);
 	write_command();
 }
