@@ -29,7 +29,7 @@
 int motor_fd = 0;
 struct ccmd* cmd;
 int quit_flag = 1;
-/*
+
 int main(int argc, char **argv)
 {
   int i;
@@ -49,7 +49,7 @@ int main(int argc, char **argv)
   motor_close();
   return 0;
 }
-*/
+
 
 void exit_program(int sig)
 {
@@ -59,12 +59,7 @@ void exit_program(int sig)
 
 void rotate(int angle)
 {
-  angle <<= 5;
-  unsigned short speed = 0x7fff + angle;
-  if (angle > 0 && speed < 0x7fff)
-    speed = 0xffff;
-  else if (angle < 0 && speed > 0x7fff)
-    speed = 0x0;
+
   cmd->offset[0] = speed;
   cmd->offset[1] = speed;
   cmd->offset[2] = speed;
