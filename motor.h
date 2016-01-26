@@ -16,6 +16,7 @@ void turn_left(int);
 void turn_right(int);
 void move_left(int radius,int speed);
 void move_right(int radius,int speed);
+void stop();
 //speedには大体500くらいいれるといいかな。
 
 

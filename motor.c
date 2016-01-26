@@ -29,14 +29,12 @@
 int motor_fd = 0;
 struct ccmd* cmd;
 int quit_flag = 1;
-float first_heading = 0;
-
-/*int main(int argc, char **argv)
+/*
+int main(int argc, char **argv)
 {
   int i;
 
   signal(SIGINT, exit_program);
-	acce_init();
   motor_init();
 	i = 0;
 
@@ -251,7 +249,6 @@ void motor_init()
   cmd->breaks = SET_BREAKS | CH0 | CH1 | CH2 | CH3;
 
   cmd->wrrom = 0;
-	first_heading = get_heading();
 }
 
 
