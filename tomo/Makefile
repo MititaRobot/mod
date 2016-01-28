@@ -16,7 +16,8 @@ $(TARGET): $(OBJS)
 
 .c.o:
 	$(CC) $(CPPFLAGS) -c $<
-janken.o: playSound.h
+janken.o: playSound.h janken.cpp
+playSound.o: playSound.h
 clean:
 	$(RM) $(OBJS)
 

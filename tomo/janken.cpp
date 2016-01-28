@@ -9,7 +9,7 @@
 //#include "colorExtaraction"
 //#include <opencv/highgui.h>
 
-#include "../playSound.h"
+#include "playSound.h"
 
 #define SLEEP_TIME 2
 #define HOUCHI_FRAME 100
@@ -161,7 +161,8 @@ int main(int argc, char **argv)
 	//char *command[] = {"aplay", "-D", "plughw:0,0", "/home/pi/mod/tomo/voice_wav/oc.wav", NULL};
 	//execvp(command[0], command);
 	playSound("/home/pi/mod/tomo/voice_wav/janken.wav", WNOHANG);
-	sleep(1);
+	printf("---------------------------------\n");
+	sleep(100);
 
 	while (1)
 	{
@@ -301,6 +302,7 @@ int main(int argc, char **argv)
 				if (houchiflag == HOUCHI_FRAME) {
 					sleep(SLEEP_TIME);
 					playSound("/home/pi/mod/tomo/voice_wav/haraheri.wav", WNOHANG);
+					
 					houchiflag = 0;
 				}
 			} else {

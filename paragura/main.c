@@ -32,6 +32,13 @@
 #define NSTAT 6  /** statの種類数 */
 #define SERVER_PORT 50021
 
+typedef enum {
+	S_AIKO = 0,S_BUUCHI,S_HARAHERI,S_IDOU,
+	S_IKUZO,S_JANKEN,S_KONNICHIWA,S_MOKUHYOU,
+	S_OC,S_SAYONARA
+}SOUND;
+
+
 void print_message(char* str,...)
 {
     printf("mymurod: ");
@@ -52,6 +59,25 @@ void print_error(char* str,...)
     fprintf(stderr,"\n");
 }
 
+
+
+void play_sound(SOUND type)
+{
+	//0~9
+	if (type < S_AIKO || type > S_SAYONARA) {
+		print_error("Invalid sound type: %d",type);
+		return;
+	}
+
+	const char* names[] = {"aiko.wav","buuchi.wav","haraheri.wav","idou.wav","ikuzo.wav","janken.wav","konnichiwa.wav","mokuhyou.wav","oc.wav","sayonara.wav"};
+	
+	char path[30];
+	path[0] = '\0';
+	strcpy(path,"music/");
+	strcat(path,names[type]);
+	playSound(path,WNOHANG);	
+
+}
 
 int muro_send(int sock_fd,char *str)
 {
@@ -75,11 +101,6 @@ int muro_recv(int sock_fd,char* buf,int *receive_len)
         print_error("recv: %s",strerror(errno));
         return -1;
     }
-   /* if (*receive_len < sizeof (Muroh)) {
-        print_error("received message was not formatted by dhcp.");
-        return -2;
-    }
-		*/
     buf[*receive_len] = '\0';
     print_message("%d %s",*receive_len,buf);
     return 0;
@@ -167,6 +188,8 @@ void init( struct sockaddr_in* my_sock) {
 void in_child(int sock_fd)
 {
 
+		motor_init();
+
     char buf[MAXLEN];
     int ac;
     char*av[NARGS];
@@ -179,28 +202,30 @@ void in_child(int sock_fd)
 
     while (1) {
         bzero(buf,MAXLEN);
+				print_message("fe");
         if (muro_recv(sock_fd,buf,&len) < 0) { continue; }
         getargs(&ac,av,buf);
         if (ac == 0) { continue; }
 
         for (i = 0; i < command_num && strncmp(commands[command_num],av[0],strlen(commands[command_num])); i++);
+				print_message("%d",i);
         if (i == 6) { continue; }
 
         switch (i) {
             case 0:
-                move_forward(1000);
+                move_forward(5000);
                 break;
             case 1:
                 turn_left(1000);
                 break;
             case 2:
-                playSound("",1);
+								play_sound(S_HARAHERI);
                 break;
             case 3:
-                playSound("",1);
+                play_sound(S_IDOU);
                 break;
             case 4:
-                playSound("",1);
+                play_sound(S_JANKEN);
                 break;
             case 5:
                 stop();
@@ -210,6 +235,7 @@ void in_child(int sock_fd)
                 break;
         }
     }
+		print_error("fefe");
 }
 
 
@@ -219,6 +245,7 @@ int main(int argc, char* argv[])
     socklen_t sock_len = sizeof(recv_sock);
     init(&my_sock);
 
+		play_sound(S_AIKO);
 
     while (1) {
         if (listen(sock_fd,WAIT_SEG_SIZE) != 0) {

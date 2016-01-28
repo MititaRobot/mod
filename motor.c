@@ -30,6 +30,7 @@ int motor_fd = 0;
 struct ccmd* cmd;
 int quit_flag = 1;
 
+/*hazusita
 int main(int argc, char **argv)
 {
   int i;
@@ -49,7 +50,7 @@ int main(int argc, char **argv)
   motor_close();
   return 0;
 }
-
+*/
 
 void exit_program(int sig)
 {
@@ -57,6 +58,7 @@ void exit_program(int sig)
   fprintf(stderr, "kill signal is received\n");
 }
 
+/*hazusita
 void rotate(int angle)
 {
 
@@ -65,6 +67,7 @@ void rotate(int angle)
   cmd->offset[2] = speed;
   cmd->offset[3] = speed;
 }
+*/
 
 void move(int distance)
 {
