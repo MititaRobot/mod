@@ -9,7 +9,7 @@
 #include <sys/ioctl.h>
 #include "camera.h"
 #include <opencv/highgui.h>
-#innclude <ctype.h>
+#include <ctype.h>
 #include <time.h>
 #include <sys/time.h>
 
