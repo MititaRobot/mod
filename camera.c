@@ -115,3 +115,42 @@ void set_begin_end(int *begin, int *end)
     }
   }
 }
+
+
+int identifyRed(){
+  int i, j;
+  uchar p[3];
+  uchar tmp[160][5];
+  uchar ret[160];
+  int h = frame->height;
+  int w = frame->width;
+  int begin = -1;
+  int end = -1;
+  float count = 0.0;
+
+  for(j = 0; j < 5; j++) {
+    for (i = 0; i < w; i++) {
+      p[0] = frame->imageData[frame->widthStep * (h/2 + j) + i * 3];//G
+      p[1] = frame->imageData[frame->widthStep * (h/2 + j) + i * 3 + 1];//B
+      p[2] = frame->imageData[frame->widthStep * (h/2 + j) + i * 3 + 2];//R
+      
+      if (p[2] > p[0] + p[1])
+        tmp[i][j] = 1;
+      else
+        tmp[i][j] = 0;
+    }
+  }
+  for (i = 0; i < w; i++) {
+    ret[i] = (tmp[i][0] + tmp[i][1] + tmp[i][2] + tmp[i][3] + tmp[i][4]) / 3;
+  }
+
+  for (i = 0; i < w; i++ ){
+	count += ret[i]  
+  }
+
+  if((count / w) >= 0.2){
+	return 1;	  
+  }
+
+ return 0; 
+}
