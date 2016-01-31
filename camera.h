@@ -15,5 +15,6 @@ void camera_init(double width, double height);
 void camera_capture();
 void camera_close();
 int test_method();
+int identifyRed();
 
 #endif
