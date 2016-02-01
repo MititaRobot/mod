@@ -127,10 +127,10 @@ int main(int argc, char **argv)
 	CvCapture *capture = 0;
 	IplImage *frame = 0, *frame2 = 0, *tmp = 0, *frame3 = 0;
 	IplImage *rock = 0, *scisors = 0, *paper = 0, *dora = 0;
-	rock = cvLoadImage("/home/pi/mod/tomo/picture/rock.jpg", CV_LOAD_IMAGE_COLOR);
-	scisors = cvLoadImage("/home/pi/mod/tomo/picture/scisors.jpg", CV_LOAD_IMAGE_COLOR);
-	paper = cvLoadImage("/home/pi/mod/tomo/picture/paper.jpg", CV_LOAD_IMAGE_COLOR);
-	dora = cvLoadImage("/home/pi/mod/tomo/picture/dora.jpg", CV_LOAD_IMAGE_COLOR);
+	rock = cvLoadImage("/home/pi/mod/tomo/ver_picture/picture/rock.jpg", CV_LOAD_IMAGE_COLOR);
+	scisors = cvLoadImage("/home/pi/mod/tomo/ver_picture/picture/scisors.jpg", CV_LOAD_IMAGE_COLOR);
+	paper = cvLoadImage("/home/pi/mod/tomo/ver_picture/picture/paper.jpg", CV_LOAD_IMAGE_COLOR);
+	dora = cvLoadImage("/home/pi/mod/tomo/ver_picture/picture/dora.jpg", CV_LOAD_IMAGE_COLOR);
 	
 	int c, i, j, mode;
 	int sequence = 0;
@@ -261,7 +261,7 @@ int main(int argc, char **argv)
 			}
 			//putchar('\n');
 			finger += fingerNum;
-			//printf("%d\n", fingerNum);
+			printf("%d\n", fingerNum);
 			switch (fingerNum) {
 			case 0:f[0]++; break;
 			case 1:f[1]++; break;
@@ -271,8 +271,8 @@ int main(int argc, char **argv)
 			}
 		}
 		finger /= scanNum;
-		//printf("\nresult:%lf\n", finger);
-		//putchar('\n');
+		printf("\nresult:%lf\n", finger);
+		putchar('\n');
 
 		// ƒLƒƒƒvƒ`ƒƒ‚µ‚½‰æ‘œ‚É‰~‚ð•`‚­
 		tmp = cvCloneImage(frame);
@@ -447,7 +447,7 @@ void playSound(char *filename, int options)
 	char *command[5];
 	command[0] = "aplay";
 	command[1] = "-D";
-	command[2] = "plughw:0,0";
+	command[2] = "plughw:1,0";
 	command[3] = filename;
 	command[4] = NULL;
 

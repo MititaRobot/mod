@@ -3,7 +3,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <unistd.h>
-
+#include <opencv/cv.h>
 #include <opencv/highgui.h>
 #include "camera.h"
 
@@ -145,7 +145,7 @@ int identifyRed(){
   }
 
   for (i = 0; i < w; i++ ){
-	count += ret[i]  
+	count += ret[i];  
   }
 
   if((count / w) >= 0.2){

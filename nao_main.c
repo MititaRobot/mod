@@ -7,18 +7,28 @@
 #include "playSound.h"
 #include "onpa.h"
 #include <sys/ioctl.h>
-#include "camera.h"
 #include <opencv/highgui.h>
 #include <ctype.h>
 #include <time.h>
 #include <sys/time.h>
+#include "camera.h"
+
 
 #define TRUE 1
 #define FALSE 0
 #define MAX_WORD 128
-#define MISSION_COMPLETED 0
+#define MISSION_COMPLETED 1
+
+#define FORWORD 1
+#define RIGHT 2
+#define LEFT 3 
 
 char word[MAX_WORD];
+
+int flag = 0;
+int direct = FALSE;
+
+clock_t start,end;
 
 void init(){
 	motor_init();
@@ -33,12 +43,25 @@ void deinit(){
 }
 
 int spokenStop(){
+	float time = end - start;
+	if(direct == FORWORD && time >= 100000){
+		return TRUE;
+	}
+	if(direct == RIGHT && time >= 500){
+		return TRUE;
+	}
+	if(direct == LEFT && time >= 750){
+		return TRUE;
+	}
+	return FALSE;
+	/*
 		getWord(word);
 		printf("%s\n",word);
 		if(0 == strcmp(word, "止まってください")){
 			return TRUE;
 		}
 		return FALSE;
+		*/
 }
 
 int identifyObjectIsRed(){
@@ -46,9 +69,10 @@ int identifyObjectIsRed(){
 	camera_init(160,120);
 	camera_capture();
 	result = identifyRed();
-	camrea_close();
+	camera_close();
 	return result;
 }
+
 
 /*
 int isStop(){
@@ -69,39 +93,43 @@ int isStop(){
 int transfer(){
 	if(0 == strcmp(word, "右")){
 	 	 	playSound("/home/pi/mod/tomo/voice_wav/idou.wav", 0);
-			turn_right(0x4000);
+			turn_right(0x2000);
+			direct = RIGHT;
 			return TRUE;
 	}
 	if(0 == strcmp(word, "左")){
 			playSound("/home/pi/mod/tomo/voice_wav/idou.wav", 0);
-			turn_left(0x4000);
+			turn_left(0x2000);
+			direct = LEFT;
 			return TRUE;
 	}
 	if(0 == strcmp(word, "前")){
 			playSound("/home/pi/mod/tomo/voice_wav/idou.wav", 0);
-			move_forward(0x4000);
+			move_forward(0x2000);
+			direct = FORWORD;
 			return TRUE;
 	}
-	if(0 == strcmp(word, "後ろ")){
+/*	if(0 == strcmp(word, "後ろ")){
 			playSound("/home/pi/mod/tomo/voice_wav/idou.wav", 0);
 			move_backward(0x4000);
 			return TRUE;
 	}	
-	return FALSE;
+*/	return FALSE;
 }
 
 int existObject(){
-	if(get_onpa_length(4) <= 100){
+	if(get_onpa_length(4) <= 70){
 		return TRUE; 	
 	}
 	return FALSE;
 }
 
 int main(){
-//init
-	initAll();
 
-//konnichiwa
+	//init
+	init();
+
+/*konnichiwa
 	while(1){
 		printf("please speak konnichiwa\n");
 		getWord(word);
@@ -111,7 +139,7 @@ int main(){
 			break;
 		}
 	}
-
+*/
 //transfer
 	while(1){
 		playSound("/home/pi/mod/tomo/voice_wav/ikuzo.wav", 0);
@@ -121,26 +149,31 @@ int main(){
 		if(!transfer()){
 			continue;	
 		}
-		
+	
+		start = clock();
+
 		while(1){
-			if(existObject()){
+			if(existObject() && direct == FORWORD){
 				stop();
 				if(identifyObjectIsRed()){
-					playSound("/home/pi/mod/tomo/voice_wav/mokuhyobutu.wav", 0);
-					MISSION_COMPLETED = TRUE;
+					playSound("/home/pi/mod/tomo/voice_wav/mokuhyou.wav", 0);
+					flag = TRUE;
 					break;
 				}else{
-					playSound("/home/pi/mod/tomo/voice_wav/syougaibutu.wav", 0);
-					break;
+					playSound("/home/pi/mod/tomo/voice_wav/shougaibutu.wav", 0);
+						break;
 				}
 			}
+			end = clock();
+
 			if(spokenStop()){
+				stop();
 				playSound("/home/pi/mod/tomo/voice_wav/haraheri.wav", 0);
 				break;
 			}
 		}
 
-		if(MISSION_COMPLETED == TRUE){
+		if(flag == TRUE){
 			break;	
 		}
 	}

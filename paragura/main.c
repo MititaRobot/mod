@@ -22,6 +22,7 @@
 #include <grp.h>
 #include <sys/fcntl.h>
 #include "motor.h"
+#include "compass.h"
 #include "playSound.h"
 
 #define NHASH 4
@@ -207,7 +208,7 @@ void in_child(int sock_fd)
         getargs(&ac,av,buf);
         if (ac == 0) { continue; }
 
-        for (i = 0; i < command_num && strncmp(commands[command_num],av[0],strlen(commands[command_num])); i++);
+        for (i = 0; i < command_num && strncmp(commands[command_num],av[command_num],strlen(commands[command_num])); i++);
 				print_message("%d",i);
         if (i == 6) { continue; }
 
@@ -246,6 +247,7 @@ int main(int argc, char* argv[])
     init(&my_sock);
 
 		play_sound(S_AIKO);
+
 
     while (1) {
         if (listen(sock_fd,WAIT_SEG_SIZE) != 0) {

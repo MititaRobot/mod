@@ -3,19 +3,15 @@
 #include <stdlib.h>
 //#include <ctype.h>
 #include <time.h>
-#include <sys/time.h>
-#include <sys/wait.h>
-#include <unistd.h>
+//#include <sys/time.h>
+//#include <unistd.h>
 #include <opencv2/opencv.hpp>
 //#include "colorExtaraction"
 //#include <opencv/highgui.h>
 
-//#include "playSound.h"
-
-void playSound(char *filename, int options);
-
-#define SLEEP_TIME 2
-#define HOUCHI_FRAME 200
+#include<unistd.h>
+#include<sys/types.h>
+#include<sys/wait.h>
 
 #define ROCK 0
 #define SCISORS 1
@@ -121,25 +117,15 @@ int main(int argc, char **argv)
 	srand((unsigned) time(NULL));
 	int cpHand = rand() % 3;
 	int playerHand;
-	int aikoflag = 0;
-	int houchiflag = 0;
-	
+
 	CvCapture *capture = 0;
 	IplImage *frame = 0, *frame2 = 0, *tmp = 0, *frame3 = 0;
-	IplImage *rock = 0, *scisors = 0, *paper = 0, *dora = 0;
-	rock = cvLoadImage("/home/pi/mod/tomo/picture/rock.jpg", CV_LOAD_IMAGE_COLOR);
-	scisors = cvLoadImage("/home/pi/mod/tomo/picture/scisors.jpg", CV_LOAD_IMAGE_COLOR);
-	paper = cvLoadImage("/home/pi/mod/tomo/picture/paper.jpg", CV_LOAD_IMAGE_COLOR);
-	dora = cvLoadImage("/home/pi/mod/tomo/picture/dora.jpg", CV_LOAD_IMAGE_COLOR);
-	
 	int c, i, j, mode;
 	int sequence = 0;
 	int scanNum, jFlag = 0;
 	double finger;
 	int f[5];
 
-
-	playSound("/home/pi/mod/tomo/voice_wav/konnichiwa.wav", 0);
 	printf("---Select Janken Mode---\n");
 	printf("1:Settai\n");
 	printf("2:Oni\n");
@@ -148,9 +134,7 @@ int main(int argc, char **argv)
 	printf("Input:");
 	mode = getchar() - 48;	// ???????
 	printf("%d\n", mode);
-	playSound("/home/pi/mod/tomo/voice_wav/janken.wav", WNOHANG);
-	sleep(SLEEP_TIME);
-	
+
 	double width = 160, height = 120;
 	//double width = 320, height = 240;
 	//double width = 640, height = 480;
@@ -166,9 +150,8 @@ int main(int argc, char **argv)
 
 	// ウィンドウ作成。
 	cvNamedWindow("Capture", CV_WINDOW_AUTOSIZE);
-	//cvNamedWindow("Display", CV_WINDOW_AUTOSIZE);
-	cvNamedWindow("Hand", CV_WINDOW_AUTOSIZE);
-	cvNamedWindow("MichiHand", CV_WINDOW_AUTOSIZE);
+	cvNamedWindow("Display", CV_WINDOW_AUTOSIZE);
+	//cvNamedWindow("Mask", CV_WINDOW_AUTOSIZE);
 
 	while (1)
 	{
@@ -261,7 +244,7 @@ int main(int argc, char **argv)
 			}
 			//putchar('\n');
 			finger += fingerNum;
-			//printf("%d\n", fingerNum);
+			printf("%d\n", fingerNum);
 			switch (fingerNum) {
 			case 0:f[0]++; break;
 			case 1:f[1]++; break;
@@ -271,16 +254,16 @@ int main(int argc, char **argv)
 			}
 		}
 		finger /= scanNum;
-		//printf("\nresult:%lf\n", finger);
-		//putchar('\n');
+		printf("\nresult:%lf\n", finger);
+		putchar('\n');
 
 		// キャプチャした画像に円を描く
 		tmp = cvCloneImage(frame);
 		cvCircle(tmp, center, radius, cvScalar(0,0,255,1));
 
 		cvShowImage("Capture", tmp);
-		//cvShowImage("Display", frame2);
-		//cvShowImage("Hand", frame3);
+		cvShowImage("Display", frame2);
+		//cvShowImage("Mask", frame3);
 
 		c = cvWaitKey(2);
 		if (c == '\x1b') break;	// ESCを押すと, break
@@ -304,35 +287,23 @@ int main(int argc, char **argv)
 		if (loopEnd < radius * ACCURACY) {
 			//cvWaitKey(0);
 			jFlag = 0;
-			houchiflag++;
-			if (houchiflag == HOUCHI_FRAME) {
-				playSound("/home/pi/mod/tomo/voice_wav/haraheri.wav",WNOHANG);
-				sleep(SLEEP_TIME);
-				houchiflag = 0;
-			}
 			continue;
-		} else {
-			houchiflag = 0;
 		}
 		jFlag++;
 		if (jFlag == COUNT_OF_DEFINITION) {
 			if (finger <= 0.7) {
 				playerHand = ROCK;
-				cvShowImage("Hand", rock);
 				printf("your hand is ROCK!\n");
 			} else if (finger <= 2) {
 				if (f[4] > 0 || f[3] > 1) {
 					playerHand = PAPER;
-					cvShowImage("Hand", paper);
 					printf("your hand is PAPER!\n");
 				} else {
 					playerHand = SCISORS;
-					cvShowImage("Hand", scisors);
 					printf("your hand is SCISORS!\n");
 				}
 			} else {
 				playerHand = PAPER;
-				cvShowImage("Hand", paper);
 				printf("your hand is PAPER!\n");
 			}
 
@@ -348,20 +319,12 @@ int main(int argc, char **argv)
 			}
 			switch (cpHand) {
 			case ROCK:
-				if (mode == MICHIEMON) {
-					cvShowImage("MichiHand", dora);
-				}
-				else {
-					cvShowImage("MichiHand", rock);
-				}
 				printf("Michiemon's hand is ROCK!\n");
 				break;
 			case SCISORS:
-				cvShowImage("MichiHand", scisors);
 				printf("Michiemon's hand is SCISORS!\n");
 				break;
 			case PAPER:
-				cvShowImage("MichiHand", paper);
 				printf("Michiemon's hand is PAPER!\n");
 				break;
 			default:
@@ -372,17 +335,13 @@ int main(int argc, char **argv)
 
 			if (playerHand == cpHand) {
 				printf("AIKO!!\n");
-				aikoflag = 1;
-				playSound("/home/pi/mod/tomo/voice_wav/ikuzo.wav", 0);
 			} else if (playerHand == ROCK) {
 				switch (cpHand) {
 				case SCISORS:
-					printf("YOU WIN!\n");
-					playSound("/home/pi/mod/tomo/voice_wav/sayonara.wav", 0);
+					printf("YOU WIN!!\n");
 					break;
 				case PAPER:
 					printf("YOU LOSE..\n");
-					playSound("/home/pi/mod/tomo/voice_wav/oc.wav", 0);
 					break;
 				default:
 					fprintf(stderr, "switch(hand == ROCK)-default err\n");
@@ -392,11 +351,9 @@ int main(int argc, char **argv)
 				switch (cpHand) {
 				case PAPER:
 					printf("YOU WIN!!\n");
-					playSound("/home/pi/mod/tomo/voice_wav/sayonara.wav", 0);
 					break;
 				case ROCK:
 					printf("YOU LOSE..\n");
-					playSound("/home/pi/mod/tomo/voice_wav/oc_robo.wav", 0);
 					break;
 				default:
 					fprintf(stderr, "switch(hand == SCISORS)-default err\n");
@@ -406,11 +363,9 @@ int main(int argc, char **argv)
 				switch (cpHand) {
 				case ROCK:
 					printf("YOU WIN!!\n");
-					playSound("/home/pi/mod/tomo/voice_wav/sayonara.wav", 0);
 					break;
 				case SCISORS:
 					printf("YOU LOSE..\n");
-					playSound("/home/pi/mod/tomo/voice_wav/oc.wav", 0);
 					break;
 				default:
 					fprintf(stderr, "switch(hand == PAPER)-default err\n");
@@ -420,44 +375,16 @@ int main(int argc, char **argv)
 				fprintf(stderr, "your hand is not JANKEN\n");
 				exit(1);
 			}
+
 			cvWaitKey(0);
-			if (aikoflag != 0) {
-				playSound("/home/pi/mod/tomo/voice_wav/aiko.wav", WNOHANG);
-				aikoflag = 0;
-			} else {
-				playSound("/home/pi/mod/tomo/voice_wav/janken.wav", WNOHANG);
-			}
-			sleep(SLEEP_TIME);
 		}
 	}
 
 	// 後片付け。
 	cvReleaseCapture(&capture);
 	cvDestroyWindow("Capture");
-	//cvDestroyWindow("Display");
-	cvDestroyWindow("Hand");
-	cvDestroyWindow("CpHand");
+	cvDestroyWindow("Display");
+	//cvDestroyWindow("Mask");
 
 	return 0;
-}
-
-void playSound(char *filename, int options)
-{
-	pid_t pid;
-	char *command[5];
-	command[0] = "aplay";
-	command[1] = "-D";
-	command[2] = "plughw:0,0";
-	command[3] = filename;
-	command[4] = NULL;
-
-	if ((pid = fork()) < 0) {
-		perror("fork");
-		exit(1);
-	} else if (pid == 0) { // child
-		execvp(command[0], command);
-		exit(1);
-	} else {						// parent
-		waitpid(pid, NULL, options);
-	}
 }

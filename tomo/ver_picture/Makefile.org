@@ -3,9 +3,9 @@ CC = g++
 LDFLAGS = -lopencv_legacy -lopencv_highgui -lopencv_core -lopencv_ml -lopencv_video -lopencv_imgproc -lopencv_calib3d -lopencv_objdetect -L/usr/lib
 CPPFLAGS = -lm -g -I/usr/include/opencv -I/usr/include/opencv2
 
-TARGET = janken
-SRCS = janken.cpp  
-OBJS = janken.o 
+TARGET = test
+SRCS = camera.c test_camera.c
+OBJS = camera.o test_camera.o
 
 RM = rm -f
 
@@ -17,6 +17,8 @@ $(TARGET): $(OBJS)
 .c.o:
 	$(CC) $(CPPFLAGS) -c $<
 
+camera.o: camera.h
+test_camera.o: camera.h
 
 clean:
 	$(RM) $(OBJS)
