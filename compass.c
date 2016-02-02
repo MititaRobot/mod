@@ -41,6 +41,7 @@ float get_heading()
 	float heading = 180 * atan2(magRaw[1],magRaw[0])/M_PI;
   if(heading < 0)
 	  heading += 360;
+		
 	return heading;
 }
 

@@ -35,7 +35,7 @@
 
 typedef enum {
 	S_AIKO = 0,S_BUUCHI,S_HARAHERI,S_IDOU,
-	S_IKUZO,S_JANKEN,S_KONNICHIWA,S_MOKUHYOU,
+	S_IKUZO,S_JANKEN,S_HELLO,S_MOKUHYOU,
 	S_OC,S_SAYONARA
 }SOUND;
 
@@ -70,7 +70,7 @@ void play_sound(SOUND type)
 		return;
 	}
 
-	const char* names[] = {"aiko.wav","buuchi.wav","haraheri.wav","idou.wav","ikuzo.wav","janken.wav","konnichiwa.wav","mokuhyou.wav","oc.wav","sayonara.wav"};
+	const char* names[] = {"aiko.wav","buuchi.wav","haraheri.wav","idou.wav","ikuzo.wav","janken.wav","hello.wav","mokuhyou.wav","oc.wav","sayonara.wav"};
 	
 	char path[30];
 	path[0] = '\0';
@@ -158,6 +158,35 @@ void sigint_handler()
     close(sock_fd);
     exit(1);
 }
+void mokuhyou()
+{
+
+	turn_left(80000);
+	usleep(500000);
+	turn_right(80000);
+	usleep(500000);
+	turn_left(80000);
+	usleep(500000);
+	turn_right(80000);
+	usleep(500000);
+	turn_left(75000);
+	usleep(100000);
+	stop();
+}
+
+void haraheri()
+{
+
+}
+
+void hello()
+{
+	move_forward(80000);
+	usleep(500000);
+	move_backward(80000);
+	usleep(500000);
+	stop();
+}
 
 
 void init( struct sockaddr_in* my_sock) {
@@ -191,24 +220,24 @@ void in_child(int sock_fd)
 
 		motor_init();
 
+
     char buf[MAXLEN];
     int ac;
     char*av[NARGS];
     int len = 0;
     int fd = 0;
     int i = 0;
-    char *commands[] = {"move","rotate","found","alert","insecure""quit"};
+    char *commands[] = {"move","rotate","hara","hello","moku","quit"};
     int command_num = 6;
 
 
     while (1) {
         bzero(buf,MAXLEN);
-				print_message("fe");
         if (muro_recv(sock_fd,buf,&len) < 0) { continue; }
         getargs(&ac,av,buf);
         if (ac == 0) { continue; }
 
-        for (i = 0; i < command_num && strncmp(commands[command_num],av[command_num],strlen(commands[command_num])); i++);
+        for (i = 0; i < command_num && strncmp(commands[i],av[0],strlen(commands[i])); i++);
 				print_message("%d",i);
         if (i == 6) { continue; }
 
@@ -221,12 +250,15 @@ void in_child(int sock_fd)
                 break;
             case 2:
 								play_sound(S_HARAHERI);
+								haraheri();
                 break;
             case 3:
-                play_sound(S_IDOU);
+                play_sound(S_HELLO);
+								hello();
                 break;
             case 4:
-                play_sound(S_JANKEN);
+                play_sound(S_MOKUHYOU);
+								mokuhyou();
                 break;
             case 5:
                 stop();
@@ -236,7 +268,6 @@ void in_child(int sock_fd)
                 break;
         }
     }
-		print_error("fefe");
 }
 
 
@@ -246,7 +277,8 @@ int main(int argc, char* argv[])
     socklen_t sock_len = sizeof(recv_sock);
     init(&my_sock);
 
-		play_sound(S_AIKO);
+		play_sound(S_IKUZO);
+		
 
 
     while (1) {

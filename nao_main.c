@@ -12,7 +12,8 @@
 #include <time.h>
 #include <sys/time.h>
 #include "camera.h"
-
+#include "compass.h"
+#include "math.h"
 
 #define TRUE 1
 #define FALSE 0
@@ -28,22 +29,41 @@ char word[MAX_WORD];
 int flag = 0;
 int direct = FALSE;
 
-clock_t start,end;
+clock_t start_t,end_t;
+float start_c,end_c;
 
 void init(){
 	motor_init();
 	connectJulius(HOST_PORT);
 	onpa_init();
+	acce_init();
 }
 
 void deinit(){
 	closeJulius();
 	motor_close();
 	onpa_close();
+	acce_close();
 }
 
 int spokenStop(){
-	float time = end - start;
+	float time = end_t - start_t;
+	float compass = abs(end_c - start_c);
+	printf("%lf\n", start_c);
+	printf("%lf\n", end_c);
+	printf("%lf\n", compass);
+	if(direct == FORWORD && time >= 50000){
+		return TRUE;
+	}
+	if(direct == RIGHT && compass >= 15){
+		return TRUE;
+	}
+	if(direct == LEFT && compass >= 17){
+		return TRUE;
+	}
+	return FALSE;
+	
+	/*
 	if(direct == FORWORD && time >= 100000){
 		return TRUE;
 	}
@@ -54,6 +74,7 @@ int spokenStop(){
 		return TRUE;
 	}
 	return FALSE;
+	*/
 	/*
 		getWord(word);
 		printf("%s\n",word);
@@ -99,7 +120,7 @@ int transfer(){
 	}
 	if(0 == strcmp(word, "左")){
 			playSound("/home/pi/mod/tomo/voice_wav/idou.wav", 0);
-			turn_left(0x2000);
+			turn_left(0x1800);
 			direct = LEFT;
 			return TRUE;
 	}
@@ -129,7 +150,7 @@ int main(){
 	//init
 	init();
 
-/*konnichiwa
+//konnichiwa
 	while(1){
 		printf("please speak konnichiwa\n");
 		getWord(word);
@@ -139,7 +160,7 @@ int main(){
 			break;
 		}
 	}
-*/
+
 //transfer
 	while(1){
 		playSound("/home/pi/mod/tomo/voice_wav/ikuzo.wav", 0);
@@ -150,7 +171,8 @@ int main(){
 			continue;	
 		}
 	
-		start = clock();
+		start_t = clock();
+		start_c = get_heading();
 
 		while(1){
 			if(existObject() && direct == FORWORD){
@@ -164,7 +186,8 @@ int main(){
 						break;
 				}
 			}
-			end = clock();
+			end_t = clock();
+			end_c = get_heading();
 
 			if(spokenStop()){
 				stop();

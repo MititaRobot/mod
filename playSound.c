@@ -10,7 +10,7 @@ void playSound(char *filename, int options)
 	char *command[5];
 	command[0] = "aplay";
 	command[1] = "-D";
-	command[2] = "plughw:0,0";
+	command[2] = "plughw:1,0";
 	command[3] = filename;
 	command[4] = NULL;
 
